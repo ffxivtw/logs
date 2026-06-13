@@ -1,0 +1,7 @@
+# 上游 reference repo（獨立 git repo，不納入本專案版控）
+Final-Fantasy-XIV-Ranking-for-TC/
+
+node_modules/
+dist/
+public/data/
+.env

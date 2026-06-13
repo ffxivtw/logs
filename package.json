@@ -1,0 +1,17 @@
+{
+  "name": "fflogs-uploader-leaderboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20.0.0" },
+  "scripts": {
+    "build:data": "node scripts/build_data.mjs",
+    "validate:data": "node scripts/validate_data.mjs",
+    "test": "node --test scripts/build_data.test.mjs scripts/identity.test.mjs",
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": { "vue": "^3.5.13" },
+  "devDependencies": { "@vitejs/plugin-vue": "^5.2.4", "vite": "^6.3.5" }
+}

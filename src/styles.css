@@ -1,0 +1,519 @@
+/* 設計 token —— 深色戰鬥工具底 + FFLogs parse 百分位色階 */
+:root {
+  color-scheme: dark;
+  --bg: #15171d;
+  --panel: #1b1e26;
+  --panel-2: #222634;
+  --line: #2d3240;
+  --text: #d6dae3;
+  --muted: #8a92a4;
+  --gold: #e5cc80;
+  --pink: #e268a8;
+  --orange: #ff8a2a;
+  --purple: #b06ce8;
+  --blue: #4f9bdd;
+  --green: #5fcf6a;
+  --tier-grey: #98a0ae;
+  --serif: "Noto Serif TC", "Source Han Serif TC", "Songti TC", PMingLiU, serif;
+  --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── header ── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 1.25rem;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+header h1 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+header h1 a { color: var(--text); }
+header h1 a:hover { text-decoration: none; color: var(--gold); }
+header h1 em { font-style: normal; color: var(--gold); }
+
+/* ── layout ── */
+main {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 1.25rem 3rem;
+}
+
+footer {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+}
+
+/* ── 首頁 hero：問題本身就是主視覺 ── */
+.hero {
+  padding: 3.5rem 0 2rem;
+  animation: rise 0.5s ease-out both;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.hero-q {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.hero-q em {
+  font-style: normal;
+  color: var(--gold);
+  font-size: 1.25em;
+  line-height: 1;
+}
+
+.hero-sub {
+  margin: 0.5rem 0 0;
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.hero-stats {
+  margin: 1.5rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.hero-stats b {
+  color: var(--text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ── 表格 ── */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+th {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+td { font-size: 0.95rem; }
+
+tbody tr:hover { background: var(--panel); }
+
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--text); }
+th.active { color: var(--gold); }
+th.active::after { content: " ↓"; }
+
+td.num { font-family: var(--mono); font-size: 0.9rem; }
+
+/* ── signature：parse 百分位名次 ── */
+.rank {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.9rem;
+  width: 3.5rem;
+}
+
+.tier-gold   { color: var(--gold); }
+.tier-pink   { color: var(--pink); }
+.tier-orange { color: var(--orange); }
+.tier-purple { color: var(--purple); }
+.tier-blue   { color: var(--blue); }
+.tier-green  { color: var(--green); }
+.tier-grey   { color: var(--tier-grey); }
+
+.tier-legend {
+  margin: 1rem 0 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.tier-legend span { margin-right: 0.9rem; white-space: nowrap; }
+
+/* ── 頁面標題與摘要 ── */
+.page-title {
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  margin: 2.5rem 0 0.5rem;
+  text-wrap: balance;
+}
+
+.title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem 1rem;
+  flex-wrap: wrap;
+  margin: 2.5rem 0 0.5rem;
+}
+
+.title-row .page-title { margin: 0; }
+
+.profile-link {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.page-summary {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.page-summary b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.state-msg {
+  margin: 3rem 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+}
+
+/* ── 玩家頁：上傳者卡片 ── */
+.uploader {
+  margin: 0.75rem 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.uploader-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.uploader-head:hover { background: var(--panel-2); }
+
+.uploader-head .caret {
+  font-family: var(--mono);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.uploader-head a { color: var(--text); font-weight: 600; }
+.uploader-head a:hover { color: var(--gold); }
+
+.uploader-head .count {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+.uploader table { border-top: 1px solid var(--line); }
+.uploader td, .uploader th { padding-left: 1rem; }
+.uploader tbody tr:hover { background: var(--panel-2); }
+
+.report-code {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+/* ── 副本 tag ── */
+.tag {
+  display: inline-block;
+  margin: 0 0.4rem 0.4rem 0;
+  padding: 0.1rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.tag b { color: var(--text); font-weight: 600; }
+
+/* ── 搜尋框 ── */
+.search { position: relative; margin-left: auto; }
+
+.search input {
+  padding: 0.4rem 0.75rem;
+  min-width: 16rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.search input::placeholder { color: var(--muted); }
+
+.search input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.search ul {
+  position: absolute;
+  z-index: 30;
+  margin: 0.25rem 0 0;
+  padding: 0.25rem;
+  list-style: none;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  width: 100%;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+}
+
+.search li a {
+  display: block;
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.search li a:hover {
+  background: var(--panel-2);
+  color: var(--gold);
+  text-decoration: none;
+}
+
+/* ── 月度長條圖 ── */
+.mbars { margin: 1.5rem 0; }
+
+.mbars figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+.mbars svg { display: block; width: 100%; height: 64px; }
+.mbars .bar { fill: var(--gold); }
+.mbars .bar:hover { fill: var(--pink); }
+
+.mbars .axis {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+/* ── 顯示全部按鈕 ── */
+.show-all { text-align: center; margin: 1.25rem 0; }
+
+.show-all button {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  cursor: pointer;
+}
+
+.show-all button:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── tab 列 ── */
+.tabs {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1.5rem 0 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabs a {
+  padding: 0.5rem 0;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tabs a:hover { color: var(--text); text-decoration: none; }
+.tabs a.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ── 伺服器篩選列 ── */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0;
+}
+
+.filters button {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+}
+
+.filters button:hover { color: var(--text); }
+.filters button.active { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+
+/* ── 本人可能性信號徽章 ── */
+.idbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.idbadge .dots { display: inline-flex; gap: 2px; }
+
+.idbadge .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+}
+
+.idbadge .dot.on { background: var(--gold); }
+
+.idbadge .idsample { color: var(--muted); }
+
+.idbadge .idlow {
+  color: var(--bg);
+  background: var(--muted);
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  font-size: 0.7rem;
+}
+
+.idbadge.low { opacity: 0.55; }
+.idbadge.low .dot.on { background: var(--muted); }
+
+/* 推測本人區塊（上傳者頁） */
+.identity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.identity a { color: var(--text); font-weight: 600; }
+
+/* ★ 最可能是本人 */
+.id-star {
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* ── 響應式與動效偏好 ── */
+@media (max-width: 640px) {
+  header { gap: 0.6rem; }
+  .search { margin-left: 0; width: 100%; }
+  .search input { min-width: 0; width: 100%; }
+  .hero { padding-top: 2rem; }
+  th, td { padding: 0.45rem 0.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero { animation: none; }
+}
